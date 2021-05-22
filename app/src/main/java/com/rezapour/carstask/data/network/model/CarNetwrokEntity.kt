@@ -66,5 +66,5 @@ data class CarNetwrokEntity constructor(
 
     @SerializedName("carImageUrl")
     @Expose
-    val reza: String
+    val carImageUrl: String
 )
