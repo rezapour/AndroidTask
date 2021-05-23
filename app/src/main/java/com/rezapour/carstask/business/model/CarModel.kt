@@ -13,8 +13,8 @@ data class CarModel constructor(
     val fuelLevel: String,
     val transmission: String,
     val licensePlate: String,
-    val latitude: Long,
-    val longitude: Long,
+    val latitude: Double,
+    val longitude: Double,
     val innerCleanliness: String,
     val carImageUrl: String
 ) {

@@ -54,11 +54,11 @@ data class CarNetwrokEntity constructor(
 
     @SerializedName("latitude")
     @Expose
-    val latitude: Long,
+    val latitude: Double,
 
     @SerializedName("longitude")
     @Expose
-    val longitude: Long,
+    val longitude: Double,
 
     @SerializedName("innerCleanliness")
     @Expose
