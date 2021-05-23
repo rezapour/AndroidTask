@@ -18,21 +18,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        tv = findViewById(R.id.textviewss)
-        subscriveToObserver()
         viewmodel.getCars()
-
-    }
-
-
-    fun subscriveToObserver() {
-        viewmodel.carsList.observe(this) { state ->
-            when (state) {
-                is UiState.Success<List<CarModel>> -> tv.text = state.data.get(0).make
-                is UiState.Error -> tv.text = state.message
-                is UiState.Loading -> tv.text = "loading"
-            }
-        }
 
     }
 }
