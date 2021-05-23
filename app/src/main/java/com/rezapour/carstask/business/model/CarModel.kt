@@ -1,4 +1,4 @@
-package com.rezapour.carstask.business.modelf
+package com.rezapour.carstask.business.model
 
 data class CarModel constructor(
     val id: String,

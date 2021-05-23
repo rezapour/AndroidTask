@@ -3,8 +3,10 @@ package com.rezapour.carstask.data.network
 import com.rezapour.carstask.business.model.CarModel
 import com.rezapour.carstask.data.network.model.CarNetwrokEntity
 import com.rezapour.carstask.utils.ModelMapper
+import javax.inject.Inject
 
-class NetworkModelMapper : ModelMapper<CarNetwrokEntity, CarModel> {
+
+class NetworkModelMapper @Inject constructor() : ModelMapper<CarNetwrokEntity, CarModel> {
     override fun mapFromEntity(entity: CarNetwrokEntity): CarModel {
         return CarModel(
             id = entity.id,
