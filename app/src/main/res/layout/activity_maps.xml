@@ -8,18 +8,34 @@
     tools:context=".ui.MapsActivity">
 
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/frame"
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:background="#ffffff"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="#ffffff"
         app:layout_constraintTop_toBottomOf="@id/map">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="12dp"
+            android:text="@string/cars"
+            android:textSize="25sp"
+            android:textStyle="bold" />
 
-    </FrameLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_cars"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+    </LinearLayout>
 
     <fragment
         android:id="@+id/map"

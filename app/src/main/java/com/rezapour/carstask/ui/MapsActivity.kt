@@ -15,6 +15,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -25,28 +27,45 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.rezapour.carstask.R
+import com.rezapour.carstask.adapter.CarsLIstAdapter
 import com.rezapour.carstask.assests.Constants
 import com.rezapour.carstask.business.model.CarModel
+import com.rezapour.carstask.utils.OnclickRecyclerviewListener
 import com.rezapour.carstask.utils.UiState
 import com.rezapour.carstask.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclerviewListener {
 
     private lateinit var mMap: GoogleMap
+    private lateinit var recyclerview: RecyclerView
+    private lateinit var carsAdapter: CarsLIstAdapter
+    private var listofCars: List<CarModel> = ArrayList()
     val viewmodel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-
+        initUI()
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         subscriveToObserver()
+    }
+
+
+    private fun initUI() {
+        recyclerview = findViewById(R.id.recyclerview_cars)
+        carsAdapter = CarsLIstAdapter(this)
+        recyclerview.apply {
+            layoutManager =
+                LinearLayoutManager(this@MapsActivity, LinearLayoutManager.HORIZONTAL, false)
+            adapter = carsAdapter
+        }
+
     }
 
     override fun onRequestPermissionsResult(
@@ -61,18 +80,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         enableMyLocation()
-
-
         viewmodel.getCars()
     }
 
     private fun subscriveToObserver() {
         viewmodel.carsList.observe(this) { state ->
             when (state) {
-                is UiState.Success<List<CarModel>> -> addLocationsToMap(state.data)
+                is UiState.Success<List<CarModel>> -> success(state.data)
                 is UiState.Error -> Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
                 is UiState.Loading -> Toast.makeText(this, "loading", Toast.LENGTH_SHORT).show()
             }
@@ -80,23 +98,41 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    private fun success(list: List<CarModel>) {
+        listofCars = list
+        addLocationsToMap(list)
+        addItemstoList(list)
+    }
+
+    private fun addItemstoList(list: List<CarModel>) {
+
+        carsAdapter.addItems(list)
+        carsAdapter.notifyDataSetChanged()
+    }
+
     private fun addLocationsToMap(listcars: List<CarModel>) {
 
         for (car: CarModel in listcars) {
             val sydney = LatLng(car.latitude, car.longitude)
-            mMap.addMarker(
-                MarkerOptions().position(sydney).title(car.name).icon(
-                    vectorBitmap(
-                        this,
-                        R.drawable.ic_car,
-                        ContextCompat.getColor(this, R.color.purple_700)
-                    )
-                )
-            )
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15f))
+            addPointstoMap(sydney, car.name)
         }
     }
 
+    private fun addPointstoMap(latlong: LatLng, name: String) {
+        mMap.addMarker(
+            MarkerOptions().position(latlong).title(name).icon(
+                vectorBitmap(
+                    this,
+                    R.drawable.ic_car,
+                    ContextCompat.getColor(this, R.color.green)
+                )
+            )
+        )
+    }
+
+    private fun chnageMapCameraPosition(latlong: LatLng) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong, 15f))
+    }
 
     private fun vectorBitmap(
         contex: Context,
@@ -138,6 +174,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
                 Constants.REQUEST_LOCATION_PERMISSION
             )
+    }
+
+    override fun onRowListener(postion: Int) {
+        val car = listofCars.get(postion)
+        val carPostion = LatLng(car.latitude, car.longitude)
+        chnageMapCameraPosition(carPostion)
+
     }
 
 
