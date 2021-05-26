@@ -5,19 +5,22 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -26,6 +29,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.snackbar.Snackbar
 import com.rezapour.carstask.R
 import com.rezapour.carstask.adapter.CarsLIstAdapter
 import com.rezapour.carstask.assests.Constants
@@ -35,14 +39,19 @@ import com.rezapour.carstask.utils.UiState
 import com.rezapour.carstask.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclerviewListener {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclerviewListener,
+    View.OnClickListener {
 
     private lateinit var mMap: GoogleMap
     private lateinit var recyclerview: RecyclerView
     private lateinit var carsAdapter: CarsLIstAdapter
     private var listofCars: List<CarModel> = ArrayList()
-    val viewmodel: MainViewModel by viewModels()
+    private lateinit var fram: View
+    private lateinit var coordinator: View
+    private lateinit var progess: ProgressBar
+    private val viewmodel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,10 +63,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
         mapFragment.getMapAsync(this)
 
         subscriveToObserver()
+
     }
 
 
     private fun initUI() {
+        progess = findViewById(R.id.progress_circular)
+        coordinator = findViewById(R.id.map_activity)
+        fram = findViewById(R.id.frame)
         recyclerview = findViewById(R.id.recyclerview_cars)
         carsAdapter = CarsLIstAdapter(this)
         recyclerview.apply {
@@ -91,14 +104,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
         viewmodel.carsList.observe(this) { state ->
             when (state) {
                 is UiState.Success<List<CarModel>> -> success(state.data)
-                is UiState.Error -> Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
-                is UiState.Loading -> Toast.makeText(this, "loading", Toast.LENGTH_SHORT).show()
+                is UiState.Error -> {
+                    hideProgressbar()
+                    showSnackBar(state.message)
+                }
+                is UiState.Loading -> showProgressbar()
             }
         }
 
     }
 
     private fun success(list: List<CarModel>) {
+        hideProgressbar()
         listofCars = list
         addLocationsToMap(list)
         addItemstoList(list)
@@ -181,6 +198,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
         val carPostion = LatLng(car.latitude, car.longitude)
         chnageMapCameraPosition(carPostion)
 
+    }
+
+    private fun showSnackBar(message: String) {
+        val snackbar = Snackbar
+            .make(coordinator, message, Snackbar.LENGTH_INDEFINITE)
+            .setAction("Retry", this)
+        snackbar.show()
+    }
+
+    override fun onClick(p0: View?) {
+        viewmodel.getCars()
+    }
+
+    fun showProgressbar() {
+        progess.visibility = View.VISIBLE
+    }
+
+    fun hideProgressbar() {
+        progess.visibility = View.GONE
     }
 
 
