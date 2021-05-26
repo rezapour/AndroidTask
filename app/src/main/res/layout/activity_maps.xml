@@ -13,7 +13,7 @@
         android:id="@+id/frame"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:background="#ffffff"
+        android:background="@drawable/shap_round_corners_white"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

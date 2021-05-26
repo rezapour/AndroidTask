@@ -26,7 +26,9 @@
         -->
         <activity
             android:name=".ui.MapsActivity"
-            android:label="@string/title_activity_maps">
+            android:label="@string/title_activity_maps" />
+
+        <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,20 +37,15 @@
 
         </activity>
 
-        <activity android:name=".ui.MainActivity">
+    <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="@string/google_maps_key" />
 
-        </activity>
+    <uses-library
+        android:name="org.apache.http.legacy"
+        android:required="false" />
+</application><uses-permission android:name="android.permission.INTERNET" />
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
-    </application>
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-</manifest>
+    </manifest>

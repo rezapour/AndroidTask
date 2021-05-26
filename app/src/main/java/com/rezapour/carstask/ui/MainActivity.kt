@@ -1,24 +1,37 @@
 package com.rezapour.carstask.ui
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
-import android.widget.TextView
-import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import com.rezapour.carstask.R
-import com.rezapour.carstask.business.model.CarModel
-import com.rezapour.carstask.utils.UiState
-import com.rezapour.carstask.viewmodel.MainViewModel
-import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 
-@AndroidEntryPoint
+
 class MainActivity : AppCompatActivity() {
 
-    val viewmodel: MainViewModel by viewModels()
-    lateinit var tv: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        viewmodel.getCars()
 
+        withTimerTask(2000)
+    }
+
+    private fun withTimerTask(delay: Long) {
+        val timerTask = object : TimerTask() {
+            override fun run() {
+                nextActivity()
+            }
+        }
+
+        val timer = Timer()
+        timer.schedule(timerTask, delay)
+    }
+
+    private fun nextActivity() {
+        val intent = Intent(this, MapsActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }
+
