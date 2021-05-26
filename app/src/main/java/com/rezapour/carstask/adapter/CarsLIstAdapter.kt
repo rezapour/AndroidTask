@@ -55,7 +55,7 @@ class CarsLIstAdapter constructor(val onclickListener: OnclickRecyclerviewListen
 
             txtDriverName.text = car.name
             txtLicensePlate.text = car.licensePlate
-            val model = "${car.color} ${car.make} ${car.modelName}"
+            val model = car.modelName
             txtCarInfo.text = model
 
             Glide.with(view)
@@ -64,7 +64,6 @@ class CarsLIstAdapter constructor(val onclickListener: OnclickRecyclerviewListen
                 .error(R.drawable.ic_car)
                 .into(ivCarImage)
         }
-
         override fun onClick(p0: View?) {
             onclickListener.onRowListener(adapterPosition)
         }
