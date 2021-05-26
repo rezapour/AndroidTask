@@ -12,8 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
-    val repository: MainRepository
+    private val repository: MainRepository
 ) : ViewModel() {
 
     private val _carsList: MutableLiveData<UiState<List<CarModel>>> = MutableLiveData()
@@ -24,11 +23,7 @@ class MainViewModel @Inject constructor(
     fun getCars() {
         _carsList.value = UiState.Loading
         viewModelScope.launch {
-            try {
-                _carsList.value = repository.getCars()
-            } catch (e: Exception) {
-                _carsList.value = UiState.Error(e.message.toString())
-            }
+            _carsList.postValue(repository.getCars())
         }
     }
 

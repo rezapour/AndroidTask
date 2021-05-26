@@ -6,6 +6,7 @@ import com.rezapour.carstask.data.network.NetworkModelMapper
 import com.rezapour.carstask.utils.ModelMapper
 import com.rezapour.carstask.utils.UiState
 import retrofit2.Response
+import java.lang.Exception
 import javax.inject.Inject
 
 class MainRepositoryImpl
@@ -15,15 +16,19 @@ class MainRepositoryImpl
 ) : MainRepository {
 
     override suspend fun getCars(): UiState<List<CarModel>> {
-        val respond = apiHelper.getCars()
-        if (respond.code() == 200) {
-            val carsList = respond.body()
-            if (carsList != null)
-                return UiState.Success(mapper.mapfromEntityList(carsList))
-            else
-                return UiState.Error("List is empity")
-        } else
-            return UiState.Error("there is a problem with server")
+
+        return try {
+            val respond = apiHelper.getCars()
+            if (respond.isSuccessful()) {
+                respond.body()?.let {
+                    return@let UiState.Success(mapper.mapfromEntityList(it))
+                } ?: return UiState.Error("There is no data to show.")
+            } else
+                return UiState.Error("there is a problem with server")
+        } catch (e: Exception) {
+            return UiState.Error("Couldn't reach to server. Check your internet connection.")
+        }
+
 
     }
 }
