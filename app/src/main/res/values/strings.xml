@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SixtAndroidTask</string>
+    <string name="app_name">CarsTest</string>
     <string name="title_activity_maps">Map</string>
     <string name="cars">Cars</string>
 </resources>
