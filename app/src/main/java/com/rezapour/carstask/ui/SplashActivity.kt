@@ -7,7 +7,7 @@ import com.rezapour.carstask.R
 import java.util.*
 
 
-class MainActivity : AppCompatActivity() {
+class SplashActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
