@@ -4,9 +4,9 @@ This is a simple app that gets a list of cars from an network Api and shows them
 ## Structure and libraries
 This app is written with Kotlin.
 * Design with MVVM design pattern.
-* Retrofit for geting restful apis.
+* Retrofit for getting restful apis.
 * Dagger hilt for dependency injection
-* Glide for downloding photos.
+* Glide for downloading photos.
 * Google maps for map service.
 * Coroutines for asynchronous Tasks.
 * Architecture components
