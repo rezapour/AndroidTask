@@ -2,19 +2,20 @@ package com.rezapour.carstask.ui
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -44,6 +45,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
     private lateinit var fram: View
     private lateinit var coordinator: View
     private lateinit var progess: ProgressBar
+
+    private val googleApiClient: GoogleApiClient? = null
+    val REQUEST_LOCATION = 199
+
     private val viewmodel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +61,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
         mapFragment.getMapAsync(this)
 
         subscriveToObserver()
+
+        enableLoc()
 
     }
 
@@ -113,6 +120,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
         listofCars = list
         addLocationsToMap(list)
         addItemstoList(list)
+        setDefaultLocation()
     }
 
     private fun addItemstoList(list: List<CarModel>) {
@@ -124,8 +132,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
     private fun addLocationsToMap(listcars: List<CarModel>) {
 
         for (car: CarModel in listcars) {
-            val sydney = LatLng(car.latitude, car.longitude)
-            addPointstoMap(sydney, car.name)
+            val carspoint = LatLng(car.latitude, car.longitude)
+            addPointstoMap(carspoint, car.name)
         }
     }
 
@@ -156,9 +164,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
 
 
     private fun enableMyLocation() {
-        if (isPermissionGranted())
+        if (isPermissionGranted()) {
             mMap.isMyLocationEnabled = true
-        else
+            GpsState()
+        } else
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -184,20 +193,38 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
         viewmodel.getCars()
     }
 
-    fun showProgressbar() {
+    private fun showProgressbar() {
         progess.visibility = View.VISIBLE
     }
 
-    fun hideProgressbar() {
+    private fun hideProgressbar() {
         progess.visibility = View.GONE
     }
 
+    private fun setDefaultLocation() {
+        val point = LatLng(48.134557, 11.576921)
+        chnageMapCameraPosition(point)
+    }
 
-    fun CheckGpsStatus(context: Context): Boolean {
+
+    private fun checkGpsStatus(context: Context): Boolean {
         val locationManager = context.getSystemService(LOCATION_SERVICE) as LocationManager
-        assert(locationManager != null)
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
+    private fun GpsState() {
+        if (!checkGpsStatus(this)) {
+            val snackbar = Snackbar
+                .make(coordinator, "Gps is off, you can turn it on from here", Snackbar.LENGTH_LONG)
+                .setAction("Turn On") {
+                    val intent = Intent();
+                    intent.action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+                    startActivity(intent);
+                }
+            snackbar.show()
+        }
+
+    }
 
 }
