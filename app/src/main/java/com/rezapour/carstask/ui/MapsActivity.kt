@@ -61,9 +61,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
         mapFragment.getMapAsync(this)
 
         subscriveToObserver()
-
-        enableLoc()
-
     }
 
 
