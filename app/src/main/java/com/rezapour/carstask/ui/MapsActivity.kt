@@ -3,30 +3,22 @@ package com.rezapour.carstask.ui
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.annotation.ColorInt
-import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
@@ -34,6 +26,7 @@ import com.rezapour.carstask.R
 import com.rezapour.carstask.adapter.CarsLIstAdapter
 import com.rezapour.carstask.assests.Constants
 import com.rezapour.carstask.business.model.CarModel
+import com.rezapour.carstask.utils.IconUtil.vectorBitmap
 import com.rezapour.carstask.utils.OnclickRecyclerviewListener
 import com.rezapour.carstask.utils.UiState
 import com.rezapour.carstask.viewmodel.MainViewModel
@@ -98,6 +91,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
         mMap = googleMap
         enableMyLocation()
         viewmodel.getCars()
+
     }
 
     private fun subscriveToObserver() {
@@ -148,29 +142,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
     }
 
     private fun chnageMapCameraPosition(latlong: LatLng) {
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong, 15f))
-    }
-
-    private fun vectorBitmap(
-        contex: Context,
-        @DrawableRes id: Int,
-        @ColorInt color: Int
-    ): BitmapDescriptor {
-        val vectorDrawable = ResourcesCompat.getDrawable(contex.resources, id, null)
-        if (vectorDrawable == null) {
-            return BitmapDescriptorFactory.defaultMarker()
-        }
-        val bitmap = Bitmap.createBitmap(
-            vectorDrawable.intrinsicWidth,
-            vectorDrawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
-        val canvas = Canvas(bitmap)
-        vectorDrawable.setBounds(0, 0, canvas.width, canvas.height)
-        DrawableCompat.setTint(vectorDrawable, color)
-        vectorDrawable.draw(canvas)
-        return BitmapDescriptorFactory.fromBitmap(bitmap)
-
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong, 14f))
     }
 
 
@@ -181,6 +153,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
         ) == PackageManager.PERMISSION_GRANTED
 
     }
+
 
     private fun enableMyLocation() {
         if (isPermissionGranted())
@@ -217,6 +190,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnclickRecyclervie
 
     fun hideProgressbar() {
         progess.visibility = View.GONE
+    }
+
+
+    fun CheckGpsStatus(context: Context): Boolean {
+        val locationManager = context.getSystemService(LOCATION_SERVICE) as LocationManager
+        assert(locationManager != null)
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
 
